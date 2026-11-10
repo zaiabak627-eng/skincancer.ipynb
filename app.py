@@ -148,9 +148,7 @@ elif page == "Image Analysis":
                 if st.button("Classify Image"):
                     with st.spinner("Processing through Convolutional Neural Network..."):
                         img_resized = image.resize((224, 224))
-                        
-
-       import os
+import os
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 import requests
@@ -159,44 +157,29 @@ import streamlit as st
 @st.cache_resource
 def load_our_model():
     output = 'skin_cancer_model.keras'
-    
-    # اگر فائل موجود نہیں ہے یا اس کا سائز 1MB سے کم ہے (یعنی ٹھیک ڈاؤن لوڈ نہیں ہوئی)
     if not os.path.exists(output) or os.path.getsize(output) < 1000000:
-        try:
-            file_id = '1CkoJdzLhCgMjHt3mOjAr-vtKZ6dNiBdq'
-            url = f'https://drive.google.com/uc?export=download&id={file_id}'
+        file_id = '1CkoJdzLhCgMjHt3mOjAr-vtKZ6dNiBdq'
+        url = f'https://drive.google.com/uc?export=download&id={file_id}'
+        session = requests.Session()
+        response = session.get(url, stream=True)
+        token = None
+        for key, value in response.cookies.items():
+            if key.startswith('download_warning'):
+                token = value
+                break
+        if token:
+            params = {'id': file_id, 'confirm': token}
+            response = session.get(url, params=params, stream=True)
+        with open(output, "wb") as f:
+            for chunk in response.iter_content(chunk_size=32768):
+                if chunk:
+                    f.write(chunk)
+    model = load_model(output)
+    return model
+
+model = load_our_model()
+
             
-            session = requests.Session()
-            response = session.get(url, stream=True)
-            
-            token = None
-            for key, value in response.cookies.items():
-                if key.startswith('download_warning'):
-                    token = value
-                    break
-                    
-            if token:
-                params = {'id': file_id, 'confirm': token}
-                response = session.get(url, params=params, stream=True)
-                
-            with open(output, "wb") as f:
-                for chunk in response.iter_content(chunk_size=32768):
-                    if chunk:
-                        f.write(chunk)
-        except Exception as e:
-            st.error(f"Download failed: {e}")
-            
-    # اب ماڈل لوڈ کریں گے
-    if os.path.exists(output) and os.path.getsize(output) > 1000000:
-        try:
-            model = load_model(output)
-            return model
-        except Exception as e:
-            st.error(f"Model load error: {e}")
-            return None
-    else:
-        st.error("Model file is missing or corrupted.")
-        return None
 
 model = load_our_model()
 
