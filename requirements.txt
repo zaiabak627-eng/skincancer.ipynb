@@ -1,7 +1,7 @@
-streamlit
-tensorflow
-keras
-gdown
-requests
-pillow
+
+streamlit>=1.36
+tensorflow>=2.15
 numpy
+pillow
+gdown
+huggingface_hub
