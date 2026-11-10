@@ -148,10 +148,10 @@ elif page == "Image Analysis":
                 if st.button("Classify Image"):
                     with st.spinner("Processing through Convolutional Neural Network..."):
                         img_resized = image.resize((224, 224))
-                        import os
+                        
 import os
 import tensorflow as tf
-from tensorflow.keras.models.saving import load_model
+from tensorflow.keras.models import load_model
 import requests
 import streamlit as st
 
@@ -159,15 +159,13 @@ import streamlit as st
 def load_our_model():
     output = 'skin_cancer_model.keras'
     if not os.path.exists(output):
-        # گوگل ڈرائیو سے براہ راست فائل ڈاؤن لوڈ کرنے کا محفوظ طریقہ
+        # گوگل ڈرائیو سے فائل ڈاؤن لوڈ کرنے کا محفوظ طریقہ
         file_id = '1CkoJdzLhCgMjHt3mOjAr-vtKZ6dNiBdq'
         url = f'https://drive.google.com/uc?export=download&id={file_id}'
         
-        # سیشن کے ذریعے بڑی فائل ڈاؤن لوڈ کرنا
         session = requests.Session()
         response = session.get(url, stream=True)
         
-        # اگر کوئی کنفرمیشن ٹوکن ہو تو اسے ہینڈل کریں
         token = None
         for key, value in response.cookies.items():
             if key.startswith('download_warning'):
@@ -178,7 +176,6 @@ def load_our_model():
             params = {'id': file_id, 'confirm': token}
             response = session.get(url, params=params, stream=True)
             
-        # فائل کو ٹکڑوں میں محفوظ کریں
         with open(output, "wb") as f:
             for chunk in response.iter_content(chunk_size=32768):
                 if chunk:
@@ -187,5 +184,4 @@ def load_our_model():
     model = load_model(output)
     return model
 
-model = load_our_model()
 model = load_our_model()
