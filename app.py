@@ -149,27 +149,28 @@ elif page == "Image Analysis":
                     with st.spinner("Processing through Convolutional Neural Network..."):
                         img_resized = image.resize((224, 224))
 import os
-import tensorflow as tf
-from tensorflow.keras.models import load_model
 import gdown
 import streamlit as st
+from tensorflow.keras.models import load_model
 
 @st.cache_resource
 def load_our_model():
-    output = 'skin_cancer_model.keras'
+    model_path = "skin_cancer_model.keras"
     
-    # اگر فائل موجود نہیں ہے یا سائز 1MB سے کم ہے تو دوبارہ ڈاؤن لوڈ کرے
-    if not os.path.exists(output) or os.path.getsize(output) < 1000000:
-        file_id = '1CkoJdzLhCgMjHt3mOjAr-vtKZ6dNiBdq'
-        url = f'https://drive.google.com/uc?id={file_id}'
+    # اگر فائل لوکللی موجود نہیں ہے یا اس کا سائز 1MB سے کم ہے (یعنی وارننگ پیج ڈاؤن لوڈ ہوا ہے)
+    if not os.path.exists(model_path) or os.path.getsize(model_path) < 1024 * 1024:
+        # یہاں اپنے گوگل ڈرائیو کے شیئر ایبل لنک سے صرف File ID درج کریں
+        file_id = ""1CkoJdzLhCgMjHt3mOjAr-vtKZ6dNiBdq""
+        url = f"https://drive.google.com/uc?id={file_id}&confirm=t"
         
-        # پرانے فائل کو ڈیلیٹ کریں تاکہ کرپشن نہ ہو
-        if os.path.exists(output):
-            os.remove(output)
+        with st.spinner("ماڈل گوگل ڈرائیو سے ڈاؤن لوڈ ہو رہا ہے، براہ کرم انتظار کریں..."):
+            # fuzzy=True گوگل ڈرائیو کے وائرس اسکین وارننگ پیج کو خود بخود بائی پاس کر لیتا ہے
+            gdown.download(url, model_path, quiet=False, fuzzy=True)
             
-        gdown.download(url, output, quiet=False, fuzzy=True)
-        
-    model = load_model(output)
+    # ماڈل کو کامیابی سے لوڈ کریں
+    model = load_model(model_path)
     return model
 
+# ماڈل کو کال کریں
+model = load_our_model()
 model = load_our_model()
