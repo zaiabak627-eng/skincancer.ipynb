@@ -148,3 +148,22 @@ elif page == "Image Analysis":
                 if st.button("Classify Image"):
                     with st.spinner("Processing through Convolutional Neural Network..."):
                         img_resized = image.resize((224, 224))
+                        import os
+import os
+import tensorflow as tf
+from tensorflow.keras.models import load_model
+import gdown
+import streamlit as st
+
+@st.cache_resource
+def load_our_model():
+    output = 'skin_cancer_model.keras'
+    if not os.path.exists(output):
+        # یہ آپ کی ڈرائیو کی فائل کا براہ راست ڈاؤن لوڈ لنک ہے
+        url = 'https://drive.google.com/uc?id=1CkoJdzLhCgMjHt3mOjAr-vtKZ6dNiBdq'
+        gdown.download(url, output, quiet=False)
+        
+    model = load_model(output)
+    return model
+
+model = load_our_model()
