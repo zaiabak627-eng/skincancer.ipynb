@@ -149,38 +149,25 @@ elif page == "Image Analysis":
                     with st.spinner("Processing through Convolutional Neural Network..."):
                         img_resized = image.resize((224, 224))
 import os
-import tensorflow as tf
-from tensorflow.keras.models import load_model
-import requests
+import gdown
 import streamlit as st
 
+# گوگل ڈرائیو سے ماڈل ڈاؤن لوڈ کرنے کا فنکشن
 @st.cache_resource
-def load_our_model():
-    output = 'skin_cancer_model.keras'
-    if not os.path.exists(output) or os.path.getsize(output) < 1000000:
-        file_id = '1CkoJdzLhCgMjHt3mOjAr-vtKZ6dNiBdq'
-        url = f'https://drive.google.com/uc?export=download&id={file_id}'
-        session = requests.Session()
-        response = session.get(url, stream=True)
-        token = None
-        for key, value in response.cookies.items():
-            if key.startswith('download_warning'):
-                token = value
-                break
-        if token:
-            params = {'id': file_id, 'confirm': token}
-            response = session.get(url, params=params, stream=True)
-        with open(output, "wb") as f:
-            for chunk in response.iter_content(chunk_size=32768):
-                if chunk:
-                    f.write(chunk)
-    model = load_model(output)
-    return model
-
-model = load_our_model()
-
+def download_model():
+    model_path = "skin_cancer_model.keras"
+    
+    # اگر فائل پہلے سے موجود نہیں ہے تو ڈرائیو سے ڈاؤن لوڈ کریں
+    if not os.path.exists(model_path):
+        # یہاں اپنی گوگل ڈرائیو کی فائل کی شیئر ایبل لنک کی ID درج کریں
+        # مثال کے طور پر: https://drive.google.com/file/d/YOUR_FILE_ID/view?usp=sharing
+        file_id = "YOUR_GOOGLE_DRIVE_FILE_ID"
+        url = f"https://drive.google.com/uc?id={file_id}"
+        
+        with st.spinner("ماڈل گوگل ڈرائیو سے ڈاؤن لوڈ ہو رہا ہے، براہ کرم انتظار کریں..."):
+            gdown.download(url, model_path, quiet=False)
             
+    return model_path
 
-model = load_our_model()
-
-model = load_our_model()
+# ماڈل لوڈ کرنے سے پہلے یہ کال کریں
+model_file_path = download_model()
