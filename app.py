@@ -149,25 +149,27 @@ elif page == "Image Analysis":
                     with st.spinner("Processing through Convolutional Neural Network..."):
                         img_resized = image.resize((224, 224))
 import os
+import tensorflow as tf
+from tensorflow.keras.models import load_model
 import gdown
 import streamlit as st
 
-# گوگل ڈرائیو سے ماڈل ڈاؤن لوڈ کرنے کا فنکشن
 @st.cache_resource
-def download_model():
-    model_path = "skin_cancer_model.keras"
+def load_our_model():
+    output = 'skin_cancer_model.keras'
     
-    # اگر فائل پہلے سے موجود نہیں ہے تو ڈرائیو سے ڈاؤن لوڈ کریں
-    if not os.path.exists(model_path):
-        # یہاں اپنی گوگل ڈرائیو کی فائل کی شیئر ایبل لنک کی ID درج کریں
-        # مثال کے طور پر: https://drive.google.com/file/d/YOUR_FILE_ID/view?usp=sharing
-        file_id = "YOUR_GOOGLE_DRIVE_FILE_ID"
-        url = f"https://drive.google.com/uc?id={file_id}"
+    # اگر فائل موجود نہیں ہے یا سائز 1MB سے کم ہے تو دوبارہ ڈاؤن لوڈ کرے
+    if not os.path.exists(output) or os.path.getsize(output) < 1000000:
+        file_id = '1CkoJdzLhCgMjHt3mOjAr-vtKZ6dNiBdq'
+        url = f'https://drive.google.com/uc?id={file_id}'
         
-        with st.spinner("ماڈل گوگل ڈرائیو سے ڈاؤن لوڈ ہو رہا ہے، براہ کرم انتظار کریں..."):
-            gdown.download(url, model_path, quiet=False)
+        # پرانے فائل کو ڈیلیٹ کریں تاکہ کرپشن نہ ہو
+        if os.path.exists(output):
+            os.remove(output)
             
-    return model_path
+        gdown.download(url, output, quiet=False, fuzzy=True)
+        
+    model = load_model(output)
+    return model
 
-# ماڈل لوڈ کرنے سے پہلے یہ کال کریں
-model_file_path = download_model()
+model = load_our_model()
