@@ -152,21 +152,36 @@ elif page == "Image Analysis":
 import os
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-import gdown
+import requests
 import streamlit as st
 
 @st.cache_resource
 def load_our_model():
     output = 'skin_cancer_model.keras'
     
-    # اگر فائل موجود نہیں ہے یا نامکمل ہے تو ڈرائیو سے ڈاؤن لوڈ کرے گا
+    # اگر ماڈل فائل موجود نہیں ہے یا اس کا سائز کم ہے تو گوگل ڈرائیو سے ڈاؤن لوڈ کرے گا
     if not os.path.exists(output) or os.path.getsize(output) < 1000000:
         file_id = '1CkoJdzLhCgMjHt3mOjAr-vtKZ6dNiBdq'
-        url = f'https://drive.google.com/uc?id={file_id}'
+        url = f'https://drive.google.com/uc?export=download&id={file_id}'
         
-        # gdown کے ذریعے فائل ڈاؤن لوڈ کرنے کا محفوظ اور مستند طریقہ
-        gdown.download(url, output, quiet=False, fuzzy=True)
+        session = requests.Session()
+        response = session.get(url, stream=True)
         
+        token = None
+        for key, value in response.cookies.items():
+            if key.startswith('download_warning'):
+                token = value
+                break
+                
+        if token:
+            params = {'id': file_id, 'confirm': token}
+            response = session.get(url, params=params, stream=True)
+            
+        with open(output, "wb") as f:
+            for chunk in response.iter_content(chunk_size=32768):
+                if chunk:
+                    f.write(chunk)
+                    
     model = load_model(output)
     return model
 
