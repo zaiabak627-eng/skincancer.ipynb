@@ -1,0 +1,15 @@
+
+# SAVE TRAINED SKIN CANCER CNN MODEL
+
+import os
+import json
+
+# Save actual trained CNN model
+model.save("/kaggle/working/skin_cancer_model.keras")
+
+# Save exact class order used by the model
+with open("/kaggle/working/class_names.json", "w") as f:
+    json.dump(class_names, f, indent=4)
+
+print("CNN model saved successfully!")
+print("Class names saved successfully!")
