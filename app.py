@@ -7,10 +7,64 @@ import numpy as np
 
 # Page configuration
 st.set_page_config(
-    page_title="SkinGuard AI",
+    page_title="SkinGuard AI | Deep Learning",
     page_icon="🩺",
     layout="wide"
 )
+
+# Custom CSS for modern styling and nice dark-green theme
+st.markdown("""
+    <style>
+    .main {
+        background-color: #0e1713;
+    }
+    .stSidebar {
+        background-color: #122019;
+    }
+    .hero-card {
+        background: linear-gradient(135deg, #1b3022 0%, #112217 100%);
+        padding: 30px;
+        border-radius: 16px;
+        border: 1px solid #2d4a37;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        margin-bottom: 25px;
+    }
+    .hero-title {
+        color: #ffffff;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    .hero-subtitle {
+        color: #a3b8ad;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+    .custom-box {
+        background-color: #16261d;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #264231;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+    .stButton>button {
+        background: linear-gradient(90deg, #2e7d54 0%, #1e5337 100%);
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(46, 125, 84, 0.3);
+        transition: all 0.3s ease;
+    }
+    .stButton>button:hover {
+        background: linear-gradient(90deg, #358f60 0%, #246342 100%);
+        box-shadow: 0 6px 16px rgba(46, 125, 84, 0.5);
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # Dynamically resolve paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -31,66 +85,66 @@ except Exception as e:
     load_error = str(e)
 
 # Sidebar Navigation
-st.sidebar.title("SkinGuard AI")
-st.sidebar.markdown("DEEP LEARNING • IMAGE CLASSIFICATION")
+st.sidebar.markdown("<h2 style='color: #4ade80;'>SkinGuard AI</h2>", unsafe_allow_html=True)
+st.sidebar.markdown("<p style='color: #9ca3af; font-size: 0.85rem;'>DEEP LEARNING • IMAGE CLASSIFICATION</p>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
-st.sidebar.subheader("Navigation")
-page = st.sidebar.radio("Go to", ["Dashboard", "Image Analysis", "Skin Conditions"])
+
+st.sidebar.markdown("### Navigation")
+page = st.sidebar.radio("Go to", ["Dashboard", "Image Analysis", "Skin Conditions"], label_visibility="collapsed")
 
 st.sidebar.markdown("---")
-st.sidebar.subheader("Model Information")
-st.sidebar.markdown("**Model:** CNN")
-st.sidebar.markdown("**Task:** Skin lesion classification")
+st.sidebar.markdown("### Model Information")
+st.sidebar.info("**Model:** CNN\n\n**Task:** Skin lesion classification\n\n**Status:** " + ("🟢 Online" if model_loaded else "🔴 Offline"))
 
 if page == "Dashboard":
     st.markdown("""
-        <div style='background-color: #1b3022; padding: 25px; border-radius: 10px;'>
-            <h1 style='color: white;'>SkinGuard AI</h1>
-            <p style='color: #d1d5db;'>AI-powered skin lesion image classification using a Convolutional Neural Network.</p>
-            <p style='color: #d1d5db;'>Upload an image to explore the model's predicted class.</p>
+        <div class="hero-card">
+            <div class="hero-title">SkinGuard AI 🩺</div>
+            <div class="hero-subtitle">
+                AI-powered skin lesion image classification using an advanced Convolutional Neural Network.<br>
+                Upload an image in the <b>Image Analysis</b> section to explore the model's predicted class and confidence score.
+            </div>
         </div>
     """, unsafe_allow_html=True)
     
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("""
+            <div class="custom-box">
+                <h3 style='color: #4ade80; margin-top:0;'>🚀 System Status</h3>
+                <p style='color: #d1d5db;'>Model loading and processing pipelines are fully operational and ready to evaluate dermatological images.</p>
+            </div>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown("""
+            <div class="custom-box">
+                <h3 style='color: #4ade80; margin-top:0;'>💡 How to Use</h3>
+                <p style='color: #d1d5db;'>1. Navigate to <b>Image Analysis</b>.<br>2. Upload a clear skin lesion image (.jpg, .jpeg, .png).<br>3. Click <b>Classify Image</b> to view results.</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
     if not model_loaded:
-        st.error(f"Could not load model or class names: {load_error}")
-    else:
-        st.success("Model loaded successfully and ready for predictions!")
+        st.error(f"⚠️ Model Loading Error: {load_error}")
 
 elif page == "Image Analysis":
-    st.header("Skin Lesion Image Analysis")
+    st.markdown("<h2 style='color: #ffffff;'>🔍 Skin Lesion Image Analysis</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #9ca3af;'>Upload a skin lesion image below to run deep learning classification.</p>", unsafe_allow_html=True)
     
     if not model_loaded:
         st.error(f"Could not load model: {load_error}")
     else:
-        uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+        uploaded_file = st.file_uploader("Choose a skin image...", type=["jpg", "jpeg", "png"])
         
         if uploaded_file is not None:
-            image = Image.open(uploaded_file).convert("RGB")
-            st.image(image, caption="Uploaded Image", use_column_width=True)
+            col_img, col_res = st.columns(2)
             
-            if st.button("Classify Image"):
-                with st.spinner("Analyzing image..."):
-                    # Preprocessing image for CNN model (adjust target size according to your training setup, e.g., 224x224)
-                    img_resized = image.resize((224, 224))
-                    img_array = np.array(img_resized) / 255.0
-                    img_array = np.expand_dims(img_array, axis=0)
-                    
-                    predictions = model.predict(img_array)
-                    predicted_class = np.argmax(predictions[0])
-                    confidence = float(np.max(predictions[0])) * 100
-                    
-                    st.success(f"Prediction Complete!")
-                    st.write(f"**Predicted Class Index:** {predicted_class}")
-                    st.write(f"**Confidence:** {confidence:.2f}%")
-
-elif page == "Skin Conditions":
-    st.header("Skin Conditions Reference Guide")
-    st.markdown("""
-    - **Melanoma (mel):** A potentially serious skin cancer requiring medical assessment.
-    - **Melanocytic Nevi (nv):** Usually stable, round or oval pigmented moles.
-    - **Basal Cell Carcinoma (bcc):** A common type of skin cancer.
-    - **Actinic Keratoses (akiec):** Rough, scaly or crusty patches.
-    - **Benign Keratosis (bkl):** Waxy, rough or stuck-on appearing growth.
-    - **Dermatofibroma (df):** Small, firm skin-coloured or brown bump.
-    - **Vascular Lesions (vasc):** Red, purple or bluish skin marks.
-    """)
+            with col_img:
+                image = Image.open(uploaded_file).convert("RGB")
+                st.image(image, caption="Uploaded Sample", use_column_width=True)
+            
+            with col_res:
+                st.markdown("<div class='custom-box'>", unsafe_allow_html=True)
+                st.markdown("### Analysis Panel")
+                if st.button("Classify Image"):
+                    with st.spinner("Processing through Convolutional Neural Network..."):
+                        img_resized = image.resize((224, 224))
