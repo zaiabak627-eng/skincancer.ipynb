@@ -1,4 +1,7 @@
-gdown
 streamlit
-keras
 tensorflow
+keras
+gdown
+requests
+pillow
+numpy
