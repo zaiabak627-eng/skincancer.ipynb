@@ -159,11 +159,12 @@ import streamlit as st
 def load_our_model():
     output = 'skin_cancer_model.keras'
     if not os.path.exists(output):
-        # یہ آپ کی ڈرائیو کی فائل کا براہ راست ڈاؤن لوڈ لنک ہے
-        url = 'https://drive.google.com/uc?id=1CkoJdzLhCgMjHt3mOjAr-vtKZ6dNiBdq'
-        gdown.download(url, output, quiet=False)
+        # یہاں براہ راست file_id اور fuzzy=True استعمال کیا گیا ہے تاکہ ایرر نہ آئے
+        file_id = '1CkoJdzLhCgMjHt3mOjAr-vtKZ6dNiBdq'
+        gdown.download(id=file_id, output=output, fuzzy=True)
         
     model = load_model(output)
     return model
 
+model = load_our_model()
 model = load_our_model()
